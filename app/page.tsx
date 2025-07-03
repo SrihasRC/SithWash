@@ -20,65 +20,6 @@ export default function Home() {
           <div className="absolute inset-0 bg-[linear-gradient(0deg,transparent_24%,rgba(255,255,255,0.05)_25%,rgba(255,255,255,0.05)_26%,transparent_27%,transparent_74%,rgba(255,255,255,0.05)_75%,rgba(255,255,255,0.05)_76%,transparent_77%,transparent_100%)] bg-[length:50px_50px]" />
         </div>
         
-        {/* Floating Orbs */}
-        <div className="absolute inset-0 pointer-events-none">
-          <motion.div
-            className="absolute top-20 left-20 w-32 h-32 bg-destructive/20 rounded-full blur-xl"
-            animate={{
-              x: [0, 30, 0],
-              y: [0, -20, 0],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <motion.div
-            className="absolute top-40 right-32 w-24 h-24 bg-secondary/20 rounded-full blur-lg"
-            animate={{
-              x: [0, -25, 0],
-              y: [0, 15, 0],
-              scale: [1, 0.9, 1],
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2
-            }}
-          />
-          <motion.div
-            className="absolute bottom-32 left-32 w-20 h-20 bg-destructive/15 rounded-full blur-lg"
-            animate={{
-              x: [0, 20, 0],
-              y: [0, -10, 0],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 4
-            }}
-          />
-          <motion.div
-            className="absolute bottom-20 right-20 w-16 h-16 bg-secondary/25 rounded-full blur-md"
-            animate={{
-              x: [0, -15, 0],
-              y: [0, 25, 0],
-              scale: [1, 0.8, 1],
-            }}
-            transition={{
-              duration: 7,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1
-            }}
-          />
-        </div>
-        
         {/* Radial Gradient Overlay */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.3)_100%)]" />
         

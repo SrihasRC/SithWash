@@ -84,6 +84,8 @@ export default function AuditPage() {
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [scanProgress, setScanProgress] = useState(0);
   const [isScanning, setIsScanning] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [networkAnalysis, setNetworkAnalysis] = useState<string[]>([]);
 
   // Simulate scanning progress
   useEffect(() => {
@@ -100,6 +102,31 @@ export default function AuditPage() {
       return () => clearInterval(interval);
     }
   }, [isScanning]);
+
+  const analyzeTransaction = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setShowDetailModal(true);
+    
+    // Simulate network analysis
+    const analysisResults = [
+      `🔍 Analyzing transaction path: ${transaction.from} → ${transaction.to}`,
+      `📊 Risk assessment: ${transaction.riskScore}% - ${transaction.riskScore >= 80 ? 'CRITICAL' : transaction.riskScore >= 60 ? 'HIGH' : 'MEDIUM'} threat level`,
+      `🌐 Cross-referencing with known criminal networks...`,
+      `⚡ Dark side algorithms detecting suspicious patterns...`,
+      `🎯 Entity relationship mapping complete`,
+      `📈 Historical transaction analysis: ${Math.floor(Math.random() * 50) + 10} similar patterns found`,
+      `⚠️ Compliance violations: ${transaction.flags.length} flags raised`,
+      `🔐 Encryption analysis: ${transaction.riskScore > 70 ? 'Obfuscated' : 'Standard'} protocols detected`
+    ];
+    
+    setNetworkAnalysis(analysisResults);
+  };
+
+  const closeModal = () => {
+    setShowDetailModal(false);
+    setSelectedTransaction(null);
+    setNetworkAnalysis([]);
+  };
 
   const startScan = () => {
     setIsScanning(true);
@@ -265,7 +292,7 @@ export default function AuditPage() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
                     className="p-4 bg-card/60 rounded-lg border border-border/20 hover:bg-card/80 transition-colors cursor-pointer"
-                    onClick={() => setSelectedTransaction(transaction)}
+                    onClick={() => analyzeTransaction(transaction)}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
@@ -312,6 +339,129 @@ export default function AuditPage() {
           </Card>
         </motion.div>
       </div>
+
+      {/* Transaction Analysis Modal */}
+      {showDetailModal && selectedTransaction && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-card/95 backdrop-blur-md border border-border/20 rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">
+                <span className="text-destructive">Deep Analysis:</span> {selectedTransaction.id}
+              </h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={closeModal}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                ✕
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Transaction Details */}
+              <div className="space-y-4">
+                <Card className="bg-card/40 border-border/20">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Transaction Details</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">From:</span>
+                      <span className="font-medium">{selectedTransaction.from}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">To:</span>
+                      <span className="font-medium">{selectedTransaction.to}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Amount:</span>
+                      <span className="font-medium">{selectedTransaction.amount.toLocaleString()} credits</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Route:</span>
+                      <span className="font-medium">{selectedTransaction.planet}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Category:</span>
+                      <span className="font-medium">{selectedTransaction.category}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Risk Score:</span>
+                      <Badge className={`${getRiskBadgeColor(selectedTransaction.riskScore)}`}>
+                        {selectedTransaction.riskScore}%
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Risk Flags */}
+                <Card className="bg-card/40 border-border/20">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center">
+                      <AlertTriangle className="w-5 h-5 mr-2 text-destructive" />
+                      Risk Flags
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedTransaction.flags.map((flag, i) => (
+                        <Badge key={i} variant="destructive" className="text-xs">
+                          {flag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Network Analysis */}
+              <div className="space-y-4">
+                <Card className="bg-card/40 border-border/20">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center">
+                      <Zap className="w-5 h-5 mr-2 text-destructive" />
+                      Dark Side Analysis
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3 max-h-64 overflow-y-auto">
+                      {networkAnalysis.map((analysis, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.1 }}
+                          className="p-3 bg-background/50 rounded border border-border/10 text-sm"
+                        >
+                          {analysis}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Action Buttons */}
+                <div className="flex space-x-3">
+                  <Button className="flex-1 bg-destructive hover:bg-destructive/90">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Flag as Suspicious
+                  </Button>
+                  <Button variant="outline" className="flex-1 border-destructive/20 text-destructive hover:bg-destructive/10">
+                    <Users className="w-4 h-4 mr-2" />
+                    Map Network
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
