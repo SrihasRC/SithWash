@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
   ArrowLeft, 
@@ -68,7 +68,6 @@ export default function DashboardPage() {
     criticalAlerts: 0
   });
   const [liveMetrics, setLiveMetrics] = useState({
-    threatLevel: 67,
     activeScans: 23,
     blockedTransactions: 156,
     suspiciousActivities: 8
@@ -94,11 +93,53 @@ export default function DashboardPage() {
     });
   }, []);
 
+  // Filter transactions based on time range
+  const filteredTransactions = useMemo(() => {
+    if (!enhancedTransactions.length) return [];
+    
+    const now = new Date();
+    return enhancedTransactions.filter(t => {
+      const transactionDate = new Date(t.timestamp);
+      const timeDiff = now.getTime() - transactionDate.getTime();
+      
+      switch(timeRange) {
+        case '1h': return timeDiff <= 60 * 60 * 1000;
+        case '24h': return timeDiff <= 24 * 60 * 60 * 1000;
+        case '7d': return timeDiff <= 7 * 24 * 60 * 60 * 1000;
+        case '30d': return timeDiff <= 30 * 24 * 60 * 60 * 1000;
+        default: return true;
+      }
+    });
+  }, [enhancedTransactions, timeRange]);
+
+  // Recalculate metrics when time range changes
+  useEffect(() => {
+    if (filteredTransactions.length === 0) return;
+    
+    const fraudulent = filteredTransactions.filter(t => t.mlPrediction?.isFraud);
+    const critical = filteredTransactions.filter(t => t.riskLevel === 'critical');
+    const avgRisk = filteredTransactions.reduce((sum, t) => sum + (t.mlPrediction?.probability || 0), 0) / filteredTransactions.length;
+    
+    setMLMetrics({
+      totalTransactions: filteredTransactions.length,
+      fraudDetected: fraudulent.length,
+      fraudRate: fraudulent.length / filteredTransactions.length,
+      modelAccuracy: 0.92,
+      avgRiskScore: avgRisk,
+      criticalAlerts: critical.length
+    });
+  }, [filteredTransactions]);
+
+  // Calculate threat level based on ML data
+  const threatLevel = useMemo(() => {
+    if (filteredTransactions.length === 0) return 0;
+    return Math.round(mlMetrics.fraudRate * 100);
+  }, [mlMetrics.fraudRate, filteredTransactions.length]);
+
   // Simulate real-time ML-powered updates
   useEffect(() => {
     const interval = setInterval(() => {
       setLiveMetrics(prev => ({
-        threatLevel: Math.max(0, Math.min(100, prev.threatLevel + (Math.random() - 0.5) * 10)),
         activeScans: Math.max(0, prev.activeScans + Math.floor((Math.random() - 0.5) * 5)),
         blockedTransactions: prev.blockedTransactions + Math.floor(Math.random() * 3),
         suspiciousActivities: Math.max(0, prev.suspiciousActivities + Math.floor((Math.random() - 0.7) * 2))
@@ -110,7 +151,26 @@ export default function DashboardPage() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    // Simulate API call
+    
+    // Generate new transaction data
+    const newTransactions = generateEnhancedTransactions(100);
+    setEnhancedTransactions(newTransactions);
+    
+    // Calculate new ML metrics
+    const fraudulent = newTransactions.filter(t => t.mlPrediction?.isFraud);
+    const critical = newTransactions.filter(t => t.riskLevel === 'critical');
+    const avgRisk = newTransactions.reduce((sum, t) => sum + (t.mlPrediction?.probability || 0), 0) / newTransactions.length;
+    
+    setMLMetrics({
+      totalTransactions: newTransactions.length,
+      fraudDetected: fraudulent.length,
+      fraudRate: fraudulent.length / newTransactions.length,
+      modelAccuracy: 0.92,
+      avgRiskScore: avgRisk,
+      criticalAlerts: critical.length
+    });
+    
+    // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsRefreshing(false);
   };
@@ -151,10 +211,10 @@ export default function DashboardPage() {
   ];
 
   const riskDistribution: ChartData[] = [
-    { label: "Critical", value: enhancedTransactions.filter(t => t.riskLevel === 'critical').length, color: "#dc2626" },
-    { label: "High", value: enhancedTransactions.filter(t => t.riskLevel === 'high').length, color: "#ea580c" },
-    { label: "Medium", value: enhancedTransactions.filter(t => t.riskLevel === 'medium').length, color: "#eab308" },
-    { label: "Low", value: enhancedTransactions.filter(t => t.riskLevel === 'low').length, color: "#16a34a" }
+    { label: "Critical", value: filteredTransactions.filter(t => t.riskLevel === 'critical').length, color: "#dc2626" },
+    { label: "High", value: filteredTransactions.filter(t => t.riskLevel === 'high').length, color: "#ea580c" },
+    { label: "Medium", value: filteredTransactions.filter(t => t.riskLevel === 'medium').length, color: "#eab308" },
+    { label: "Low", value: filteredTransactions.filter(t => t.riskLevel === 'low').length, color: "#16a34a" }
   ];
 
   const systemActivity: ChartData[] = [
@@ -384,6 +444,9 @@ export default function DashboardPage() {
                     <PieChart className="w-5 h-5 mr-2 text-destructive" />
                     Risk Distribution Analysis
                   </CardTitle>
+                  <CardDescription>
+                    ML-based risk categorization of transactions for {timeRange} period
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -469,6 +532,9 @@ export default function DashboardPage() {
                     <Activity className="w-5 h-5 mr-2 text-destructive" />
                     Live Threat Monitor
                   </CardTitle>
+                  <CardDescription>
+                    ML-calculated threat level based on fraud detection rate
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -488,21 +554,21 @@ export default function DashboardPage() {
                             cx="48"
                             cy="48"
                             r="36"
-                            stroke={liveMetrics.threatLevel > 70 ? "#dc2626" : liveMetrics.threatLevel > 40 ? "#eab308" : "#16a34a"}
+                            stroke={threatLevel > 70 ? "#dc2626" : threatLevel > 40 ? "#eab308" : "#16a34a"}
                             strokeWidth="8"
                             fill="none"
                             strokeLinecap="round"
                             initial={{ pathLength: 0 }}
-                            animate={{ pathLength: liveMetrics.threatLevel / 100 }}
+                            animate={{ pathLength: threatLevel / 100 }}
                             transition={{ duration: 1 }}
                             style={{
                               strokeDasharray: "226.19",
-                              strokeDashoffset: `${226.19 * (1 - liveMetrics.threatLevel / 100)}`
+                              strokeDashoffset: `${226.19 * (1 - threatLevel / 100)}`
                             }}
                           />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-2xl font-bold">{liveMetrics.threatLevel.toFixed(0)}%</span>
+                          <span className="text-2xl font-bold">{threatLevel.toFixed(0)}%</span>
                         </div>
                       </div>
                       <p className="text-sm text-muted-foreground">Current Threat Level</p>
