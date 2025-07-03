@@ -290,11 +290,23 @@ export default function AuditPage() {
                         <SelectValue placeholder="Or select from available IDs" />
                       </SelectTrigger>
                       <SelectContent>
-                        {enhancedTransactions.slice(0, 10).map((transaction) => (
-                          <SelectItem key={transaction.id} value={transaction.id}>
-                            {transaction.id}
-                          </SelectItem>
-                        ))}
+                        {/* Show a mix of risk levels for better demo */}
+                        {enhancedTransactions
+                          .filter(t => {
+                            // Get a balanced mix of risk levels
+                            const lowRisk = enhancedTransactions.filter(tx => tx.riskLevel === 'low').slice(0, 2);
+                            const mediumRisk = enhancedTransactions.filter(tx => tx.riskLevel === 'medium').slice(0, 3);
+                            const highRisk = enhancedTransactions.filter(tx => tx.riskLevel === 'high').slice(0, 3);
+                            const criticalRisk = enhancedTransactions.filter(tx => tx.riskLevel === 'critical').slice(0, 2);
+                            
+                            const mixedTransactions = [...lowRisk, ...mediumRisk, ...highRisk, ...criticalRisk];
+                            return mixedTransactions.includes(t);
+                          })
+                          .map((transaction) => (
+                            <SelectItem key={transaction.id} value={transaction.id}>
+                              {transaction.id} - {transaction.riskLevel.toUpperCase()} Risk
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -355,7 +367,7 @@ export default function AuditPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {scannedTransactions.map((transaction, index) => (
+                  {scannedTransactions.slice().reverse().map((transaction, index) => (
                     <motion.div
                       key={transaction.id}
                       initial={{ opacity: 0, x: -20 }}
