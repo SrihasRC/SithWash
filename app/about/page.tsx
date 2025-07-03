@@ -6,8 +6,46 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Crown, Shield, Users, Eye, Sword, Star } from "lucide-react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 export default function AboutPage() {
+  const [konamiCode, setKonamiCode] = useState<string[]>([]);
+  const [showEasterEgg, setShowEasterEgg] = useState(false);
+  const [clickCount, setClickCount] = useState(0);
+  
+  useEffect(() => {
+    // Konami Code sequence: Up, Up, Down, Down, Left, Right, Left, Right, B, A
+    const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
+    
+    const handleKeyPress = (event: KeyboardEvent) => {
+      const newCode = [...konamiCode, event.code];
+      
+      // Keep only the last 10 keys
+      if (newCode.length > 10) {
+        newCode.shift();
+      }
+      
+      setKonamiCode(newCode);
+      
+      // Check if the sequence matches
+      if (newCode.length === 10 && 
+          newCode.every((key, index) => key === konamiSequence[index])) {
+        setShowEasterEgg(true);
+        setKonamiCode([]);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [konamiCode]);
+  
+  const handleDeathStarClick = () => {
+    setClickCount(prev => prev + 1);
+    if (clickCount >= 1) { // 2 clicks total (0->1->2, but we check at 1)
+      setShowEasterEgg(true);
+      setClickCount(0);
+    }
+  };
   const executives = [
     {
       name: "Darth Financius",
@@ -101,6 +139,19 @@ export default function AboutPage() {
       </div>
 
       <div className="container mx-auto px-4 py-8 relative z-10">
+        {/* Hidden Death Star Easter Egg */}
+        <motion.div
+          className="fixed top-20 right-20 w-10 h-10 bg-gray-400/30 rounded-full cursor-pointer hover:bg-gray-400/60 transition-all duration-300 z-50 pointer-events-auto"
+          onClick={handleDeathStarClick}
+          whileHover={{ scale: 1.3, rotate: 15 }}
+          whileTap={{ scale: 0.9 }}
+          title="That's no moon..."
+        >
+          <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-300/40 to-gray-600/40 flex items-center justify-center border border-gray-500/30">
+            <div className="w-1.5 h-1.5 bg-red-400/80 rounded-full animate-pulse" />
+          </div>
+        </motion.div>
+        
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -379,6 +430,73 @@ export default function AboutPage() {
           </div>
         </motion.div>
       </div>
+      
+      {/* Star Wars Easter Egg Modal */}
+      {showEasterEgg && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={() => setShowEasterEgg(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.5, opacity: 0 }}
+            transition={{ type: "spring", duration: 0.5 }}
+            className="relative bg-gradient-to-br from-gray-900 to-black border-2 border-yellow-400 rounded-lg p-8 max-w-md mx-4 text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="absolute -top-4 -left-4 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
+              ⭐
+            </div>
+            <div className="absolute -top-4 -right-4 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
+              ⭐
+            </div>
+            
+            <motion.div
+              initial={{ rotateY: 0 }}
+              animate={{ rotateY: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="text-6xl mb-4"
+            >
+              🌟
+            </motion.div>
+            
+            <h2 className="text-2xl font-bold text-yellow-400 mb-4">
+              The Force is Strong with This One!
+            </h2>
+            
+            <p className="text-gray-300 mb-4">
+              &ldquo;Your skills are complete. Indeed, you are powerful, as the Emperor has foreseen.&rdquo;
+            </p>
+            
+            <div className="text-sm text-gray-400 mb-6">
+              <p>🎯 Achievement Unlocked: Jedi Master</p>
+              <p>You found the hidden Death Star or entered the Konami Code!</p>
+            </div>
+            
+            <div className="flex justify-center space-x-4 text-2xl mb-4">
+              <span>🚀</span>
+              <span>⚔️</span>
+              <span>🛸</span>
+              <span>🌌</span>
+            </div>
+            
+            <Button
+              onClick={() => setShowEasterEgg(false)}
+              className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold"
+            >
+              May the Force be with you
+            </Button>
+            
+            <div className="mt-4 text-xs text-gray-500">
+              &ldquo;Do or do not, there is no try.&rdquo; - Master Yoda
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }
