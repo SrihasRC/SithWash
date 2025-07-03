@@ -9,7 +9,9 @@ export function Navbar() {
 
   const navItems = [
     { name: "Home", href: "/" },
+    { name: "Dashboard", href: "/dashboard" },
     { name: "Audit", href: "/audit" },
+    { name: "Network", href: "/network" },
     { name: "About", href: "/about" },
   ];
 

@@ -95,12 +95,12 @@ export default function Home() {
               the galactic financial network.
             </motion.p>
 
-            {/* CTA Button */}
+            {/* CTA Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.6 }}
-              className="flex justify-center"
+              className="flex flex-col sm:flex-row gap-4 justify-center"
             >
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-destructive via-red-600 to-destructive rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
@@ -109,17 +109,33 @@ export default function Home() {
                   size="lg"
                   className="relative bg-destructive hover:bg-destructive/90 text-destructive-foreground shadow-lg shadow-destructive/20 hover:shadow-destructive/40 transition-all duration-300 px-8 py-6 text-lg font-semibold"
                 >
-                  <Link href="/audit">
+                  <Link href="/dashboard">
                     <motion.span
                       className="inline-block"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      Start Auditing
+                      View Dashboard
                     </motion.span>
                   </Link>
                 </Button>
               </div>
+              <Button 
+                asChild 
+                variant="outline" 
+                size="lg"
+                className="border-secondary/20 text-secondary hover:bg-secondary/10 px-8 py-6 text-lg font-semibold backdrop-blur-sm bg-background/80"
+              >
+                <Link href="/audit">
+                  <motion.span
+                    className="inline-block"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Start Auditing
+                  </motion.span>
+                </Link>
+              </Button>
             </motion.div>
           </div>
         </div>
