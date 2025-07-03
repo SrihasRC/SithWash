@@ -186,9 +186,27 @@ function generateTransactionAmount(): string {
 }
 
 /**
- * Get risk level styling
+ * Get risk level color for text display
  */
-export function getRiskLevelStyle(riskLevel: string) {
+export function getRiskLevelColor(riskLevel: string): string {
+  switch (riskLevel) {
+    case 'critical':
+      return 'text-red-500';
+    case 'high':
+      return 'text-red-400';
+    case 'medium':
+      return 'text-yellow-500';
+    case 'low':
+      return 'text-green-500';
+    default:
+      return 'text-gray-500';
+  }
+}
+
+/**
+ * Get risk level badge styling
+ */
+export function getRiskLevelBadge(riskLevel: string): string {
   switch (riskLevel) {
     case 'critical':
       return 'bg-red-500/20 text-red-400 border-red-500/30';
@@ -204,17 +222,42 @@ export function getRiskLevelStyle(riskLevel: string) {
 }
 
 /**
- * Format features for display
+ * Format confidence percentage
  */
-export function formatFeatureValue(key: string, value: number): string {
-  if (key.includes('ratio') || key.includes('Ratio')) {
-    return value.toFixed(3);
-  }
-  if (key.includes('time') || key.includes('Time') || key.includes('Mins')) {
-    return `${(value / 60).toFixed(1)}h`;
-  }
-  if (key.includes('Ether') || key.includes('ether') || key.includes('val')) {
-    return value > 1000 ? `${(value / 1000).toFixed(1)}K` : value.toFixed(2);
-  }
-  return Math.round(value).toString();
+export function formatConfidence(confidence: number): string {
+  return `${(confidence * 100).toFixed(1)}%`;
+}
+
+/**
+ * Get top risk factors from ML reasoning
+ */
+export function getTopRiskFactors(reasoning: string[]): string[] {
+  return reasoning.slice(0, 3); // Return top 3 risk factors
+}
+
+/**
+ * Convert enhanced transaction to legacy transaction format for compatibility
+ */
+export function toLegacyTransaction(enhanced: EnhancedTransaction): {
+  id: string;
+  from: string;
+  to: string;
+  amount: number;
+  timestamp: string;
+  riskScore: number;
+  flags: string[];
+  planet: string;
+  category: string;
+} {
+  return {
+    id: enhanced.id,
+    from: enhanced.from,
+    to: enhanced.to,
+    amount: parseFloat(enhanced.amount.replace(' ETH', '')) * 1000, // Convert to credits
+    timestamp: enhanced.timestamp,
+    riskScore: Math.round((enhanced.mlPrediction?.probability || 0) * 100),
+    flags: enhanced.flaggedReason || [],
+    planet: `${enhanced.from.slice(0, 8)}... → ${enhanced.to.slice(0, 8)}...`,
+    category: enhanced.mlPrediction?.isFraud ? 'Suspicious Activity' : 'Normal Activity'
+  };
 }
