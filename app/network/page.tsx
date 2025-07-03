@@ -21,6 +21,10 @@ import {
   RotateCcw,
   Globe
 } from "lucide-react";
+import { 
+  generateEnhancedTransactions, 
+  formatConfidence 
+} from "@/lib/transaction-ml-utils";
 import Link from "next/link";
 
 interface NetworkNode {
@@ -34,6 +38,10 @@ interface NetworkNode {
   color: string;
   size: number;
   description: string;
+  mlRiskLevel?: 'low' | 'medium' | 'high' | 'critical';
+  fraudProbability?: number;
+  suspiciousTransactions?: number;
+  totalTransactions?: number;
 }
 
 export default function NetworkPage() {
@@ -48,6 +56,28 @@ export default function NetworkPage() {
   const [isApplyingFilters, setIsApplyingFilters] = useState(false);
   const [showTooltip, setShowTooltip] = useState<string | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
+  const [mlNetworkStats, setMLNetworkStats] = useState({
+    totalNodes: 0,
+    suspiciousNodes: 0,
+    fraudDetected: 0,
+    avgRiskScore: 0
+  });
+
+  // Initialize ML-powered network analytics
+  useEffect(() => {
+    const transactions = generateEnhancedTransactions(200);
+    
+    // Calculate network-level ML stats
+    const fraudulent = transactions.filter(t => t.mlPrediction?.isFraud);
+    const avgRisk = transactions.reduce((sum, t) => sum + (t.mlPrediction?.probability || 0), 0) / transactions.length;
+    
+    setMLNetworkStats({
+      totalNodes: transactions.length,
+      suspiciousNodes: fraudulent.length,
+      fraudDetected: fraudulent.length,
+      avgRiskScore: avgRisk
+    });
+  }, []);
 
   // Simulate threat level changes
   useEffect(() => {
@@ -63,7 +93,7 @@ export default function NetworkPage() {
     return () => clearInterval(interval);
   }, [isPlaying]);
 
-  // Enhanced 3D network data with filtering
+  // Enhanced 3D network data with ML-powered filtering
   const graphData = useMemo(() => {
     const allNodes: NetworkNode[] = [
       {
@@ -76,7 +106,11 @@ export default function NetworkPage() {
         credits: "2.4M",
         color: "#3b82f6",
         size: 25,
-        description: "Central hub for all Imperial financial operations"
+        description: "Central hub for all Imperial financial operations",
+        mlRiskLevel: "low",
+        fraudProbability: 0.05,
+        suspiciousTransactions: 2,
+        totalTransactions: 150
       },
       {
         id: "rebel-cell-1",
@@ -88,7 +122,11 @@ export default function NetworkPage() {
         credits: "340K",
         color: "#dc2626",
         size: 20,
-        description: "Known rebel financing operation"
+        description: "Known rebel financing operation",
+        mlRiskLevel: "critical",
+        fraudProbability: 0.92,
+        suspiciousTransactions: 34,
+        totalTransactions: 45
       },
       {
         id: "rebel-cell-2",
@@ -100,7 +138,11 @@ export default function NetworkPage() {
         credits: "890K",
         color: "#dc2626",
         size: 18,
-        description: "Emerging threat network"
+        description: "Emerging threat network",
+        mlRiskLevel: "high",
+        fraudProbability: 0.78,
+        suspiciousTransactions: 23,
+        totalTransactions: 32
       },
       {
         id: "outer-rim",
@@ -112,7 +154,11 @@ export default function NetworkPage() {
         credits: "1.2M",
         color: "#eab308",
         size: 22,
-        description: "Major trading hub in outer territories"
+        description: "Major trading hub in outer territories",
+        mlRiskLevel: "medium",
+        fraudProbability: 0.34,
+        suspiciousTransactions: 12,
+        totalTransactions: 89
       },
       {
         id: "shadow-bank",
@@ -124,7 +170,11 @@ export default function NetworkPage() {
         credits: "560K",
         color: "#991b1b",
         size: 24,
-        description: "Underground financial network"
+        description: "Underground financial network",
+        mlRiskLevel: "critical",
+        fraudProbability: 0.96,
+        suspiciousTransactions: 78,
+        totalTransactions: 89
       },
       {
         id: "legitimate-bank",
@@ -136,7 +186,11 @@ export default function NetworkPage() {
         credits: "8.9M",
         color: "#059669",
         size: 23,
-        description: "Legitimate banking institution"
+        description: "Legitimate banking institution",
+        mlRiskLevel: "low",
+        fraudProbability: 0.03,
+        suspiciousTransactions: 1,
+        totalTransactions: 234
       },
       {
         id: "mining-corp",
@@ -148,7 +202,11 @@ export default function NetworkPage() {
         credits: "3.1M",
         color: "#7c3aed",
         size: 19,
-        description: "Large mining corporation"
+        description: "Large mining corporation",
+        mlRiskLevel: "medium",
+        fraudProbability: 0.42,
+        suspiciousTransactions: 8,
+        totalTransactions: 67
       },
       {
         id: "trade-federation",
@@ -160,7 +218,11 @@ export default function NetworkPage() {
         credits: "4.7M",
         color: "#059669",
         size: 21,
-        description: "Official trade organization"
+        description: "Official trade organization",
+        mlRiskLevel: "low",
+        fraudProbability: 0.08,
+        suspiciousTransactions: 3,
+        totalTransactions: 156
       }
     ];
 
@@ -807,12 +869,35 @@ export default function NetworkPage() {
                             </p>
                           </div>
                           <div>
+                            <p className="text-muted-foreground">ML Risk Level</p>
+                            <Badge className={`text-xs ${
+                              selectedNode.mlRiskLevel === 'critical' ? 'bg-red-500/20 text-red-400' :
+                              selectedNode.mlRiskLevel === 'high' ? 'bg-orange-500/20 text-orange-400' :
+                              selectedNode.mlRiskLevel === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                              'bg-green-500/20 text-green-400'
+                            }`}>
+                              {selectedNode.mlRiskLevel?.toUpperCase() || 'UNKNOWN'}
+                            </Badge>
+                          </div>
+                          <div>
                             <p className="text-muted-foreground">Connections</p>
                             <p className="font-semibold">{selectedNode.connections}</p>
                           </div>
                           <div>
+                            <p className="text-muted-foreground">Fraud Probability</p>
+                            <p className="font-semibold text-purple-400">
+                              {formatConfidence(selectedNode.fraudProbability || 0)}
+                            </p>
+                          </div>
+                          <div>
                             <p className="text-muted-foreground">Credits</p>
                             <p className="font-semibold">{selectedNode.credits}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">ML Analysis</p>
+                            <p className="font-semibold">
+                              {selectedNode.suspiciousTransactions}/{selectedNode.totalTransactions} suspicious
+                            </p>
                           </div>
                           <div>
                             <p className="text-muted-foreground">Status</p>
@@ -984,6 +1069,57 @@ export default function NetworkPage() {
             {notification}
           </motion.div>
         )}
+
+        {/* ML Network Analytics */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.55 }}
+        >
+          <Card className="bg-card/40 border-border/20 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center">
+                <Target className="w-5 h-5 mr-2 text-purple-400" />
+                ML Network Analytics
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="text-center p-3 bg-background/30 rounded-lg">
+                  <p className="text-2xl font-bold text-purple-400">{formatConfidence(mlNetworkStats.avgRiskScore)}</p>
+                  <p className="text-xs text-muted-foreground">Avg Risk Score</p>
+                </div>
+                <div className="text-center p-3 bg-background/30 rounded-lg">
+                  <p className="text-2xl font-bold text-red-400">{mlNetworkStats.fraudDetected}</p>
+                  <p className="text-xs text-muted-foreground">Fraud Detected</p>
+                </div>
+                <div className="text-center p-3 bg-background/30 rounded-lg">
+                  <p className="text-2xl font-bold text-orange-400">{mlNetworkStats.suspiciousNodes}</p>
+                  <p className="text-xs text-muted-foreground">Suspicious Nodes</p>
+                </div>
+                <div className="text-center p-3 bg-background/30 rounded-lg">
+                  <p className="text-2xl font-bold text-blue-400">{mlNetworkStats.totalNodes}</p>
+                  <p className="text-xs text-muted-foreground">Total Analyzed</p>
+                </div>
+              </div>
+              
+              <div className="mt-4 pt-4 border-t border-border/20">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>ML Confidence</span>
+                    <span className="text-green-400">High</span>
+                  </div>
+                  <div className="w-full bg-background/30 rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
+                      style={{ width: '87%' }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );

@@ -25,6 +25,11 @@ import {
   RefreshCw
 } from "lucide-react";
 import Link from "next/link";
+import { 
+  generateEnhancedTransactions, 
+  type EnhancedTransaction, 
+  formatConfidence 
+} from "@/lib/transaction-ml-utils";
 
 interface MetricCard {
   title: string;
@@ -53,6 +58,15 @@ interface ActivityItem {
 export default function DashboardPage() {
   const [timeRange, setTimeRange] = useState<'1h' | '24h' | '7d' | '30d'>('24h');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [enhancedTransactions, setEnhancedTransactions] = useState<EnhancedTransaction[]>([]);
+  const [mlMetrics, setMLMetrics] = useState({
+    totalTransactions: 0,
+    fraudDetected: 0,
+    fraudRate: 0,
+    modelAccuracy: 0,
+    avgRiskScore: 0,
+    criticalAlerts: 0
+  });
   const [liveMetrics, setLiveMetrics] = useState({
     threatLevel: 67,
     activeScans: 23,
@@ -60,7 +74,27 @@ export default function DashboardPage() {
     suspiciousActivities: 8
   });
 
-  // Simulate real-time data updates
+  // Initialize ML-powered analytics
+  useEffect(() => {
+    const transactions = generateEnhancedTransactions(100);
+    setEnhancedTransactions(transactions);
+    
+    // Calculate ML metrics
+    const fraudulent = transactions.filter(t => t.mlPrediction?.isFraud);
+    const critical = transactions.filter(t => t.riskLevel === 'critical');
+    const avgRisk = transactions.reduce((sum, t) => sum + (t.mlPrediction?.probability || 0), 0) / transactions.length;
+    
+    setMLMetrics({
+      totalTransactions: transactions.length,
+      fraudDetected: fraudulent.length,
+      fraudRate: fraudulent.length / transactions.length,
+      modelAccuracy: 0.92, // Using known accuracy from our model
+      avgRiskScore: avgRisk,
+      criticalAlerts: critical.length
+    });
+  }, []);
+
+  // Simulate real-time ML-powered updates
   useEffect(() => {
     const interval = setInterval(() => {
       setLiveMetrics(prev => ({
@@ -83,44 +117,44 @@ export default function DashboardPage() {
 
   const metricCards: MetricCard[] = [
     {
-      title: "Threat Level",
-      value: `${liveMetrics.threatLevel.toFixed(0)}%`,
+      title: "ML Fraud Detection",
+      value: `${(mlMetrics.fraudRate * 100).toFixed(1)}%`,
       change: -2.3,
       trend: 'down',
       icon: <Shield className="w-5 h-5" />,
-      description: "Current galaxy-wide threat assessment"
+      description: "ML-powered fraud detection rate"
     },
     {
-      title: "Active Scans",
-      value: liveMetrics.activeScans.toString(),
+      title: "Transactions Analyzed",
+      value: mlMetrics.totalTransactions.toLocaleString(),
       change: 12.5,
       trend: 'up',
       icon: <Eye className="w-5 h-5" />,
-      description: "Real-time network monitoring"
+      description: "Real-time ML analysis pipeline"
     },
     {
-      title: "Blocked Transactions",
-      value: liveMetrics.blockedTransactions.toLocaleString(),
+      title: "Critical Alerts",
+      value: mlMetrics.criticalAlerts.toString(),
       change: 8.7,
       trend: 'up',
       icon: <CreditCard className="w-5 h-5" />,
-      description: "Suspicious transactions prevented"
+      description: "High-risk transactions flagged"
     },
     {
-      title: "Credits Secured",
-      value: "2.4M",
-      change: 15.2,
+      title: "Model Accuracy",
+      value: `${(mlMetrics.modelAccuracy * 100).toFixed(1)}%`,
+      change: 0.5,
       trend: 'up',
       icon: <DollarSign className="w-5 h-5" />,
-      description: "Total credits protected today"
+      description: "ML model performance metric"
     }
   ];
 
   const riskDistribution: ChartData[] = [
-    { label: "Critical", value: 15, color: "#dc2626" },
-    { label: "High", value: 23, color: "#ea580c" },
-    { label: "Medium", value: 35, color: "#eab308" },
-    { label: "Low", value: 27, color: "#16a34a" }
+    { label: "Critical", value: enhancedTransactions.filter(t => t.riskLevel === 'critical').length, color: "#dc2626" },
+    { label: "High", value: enhancedTransactions.filter(t => t.riskLevel === 'high').length, color: "#ea580c" },
+    { label: "Medium", value: enhancedTransactions.filter(t => t.riskLevel === 'medium').length, color: "#eab308" },
+    { label: "Low", value: enhancedTransactions.filter(t => t.riskLevel === 'low').length, color: "#16a34a" }
   ];
 
   const systemActivity: ChartData[] = [
@@ -134,39 +168,38 @@ export default function DashboardPage() {
     {
       id: "1",
       type: "alert",
-      message: "High-risk transaction detected from Outer Rim",
+      message: `ML Model flagged ${mlMetrics.fraudDetected} suspicious transactions`,
       timestamp: "2 minutes ago",
-      severity: "high",
-      amount: "45,000 credits"
+      severity: mlMetrics.fraudDetected > 20 ? "high" : "medium",
+      amount: `${mlMetrics.fraudDetected} transactions`
     },
     {
       id: "2",
       type: "block",
-      message: "Suspicious network connection blocked",
+      message: "High-confidence fraud prediction - transaction blocked",
       timestamp: "5 minutes ago",
       severity: "critical"
     },
     {
       id: "3",
       type: "scan",
-      message: "Deep audit completed for Shadow Banking Network",
+      message: `Deep ML analysis completed on ${mlMetrics.totalTransactions} transactions`,
       timestamp: "12 minutes ago",
       severity: "medium"
     },
     {
       id: "4",
       type: "approve",
-      message: "Legitimate transaction approved - Trade Federation",
+      message: `Model accuracy maintained at ${(mlMetrics.modelAccuracy * 100).toFixed(1)}%`,
       timestamp: "18 minutes ago",
-      severity: "low",
-      amount: "1.2M credits"
+      severity: "low"
     },
     {
       id: "5",
       type: "alert",
-      message: "Pattern analysis detected circular transfers",
+      message: `Feature analysis detected ${mlMetrics.criticalAlerts} critical risk patterns`,
       timestamp: "25 minutes ago",
-      severity: "high"
+      severity: mlMetrics.criticalAlerts > 5 ? "high" : "medium"
     }
   ];
 
@@ -537,6 +570,77 @@ export default function DashboardPage() {
             </motion.div>
           </div>
         </div>
+
+        {/* ML Insights Section */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.55 }}
+        >
+          <Card className="bg-card/40 border-border/20 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <BarChart3 className="w-5 h-5 mr-2 text-purple-400" />
+                ML Model Insights
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="text-center p-3 bg-background/30 rounded-lg">
+                    <div className="text-lg font-bold text-green-400">
+                      {formatConfidence(mlMetrics.avgRiskScore)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Avg Risk Score</div>
+                  </div>
+                  <div className="text-center p-3 bg-background/30 rounded-lg">
+                    <div className="text-lg font-bold text-blue-400">
+                      {mlMetrics.fraudDetected}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Fraud Detected</div>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Model Performance</span>
+                    <span className="text-sm font-medium">{formatConfidence(mlMetrics.modelAccuracy)}</span>
+                  </div>
+                  <div className="w-full bg-background/30 rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full transition-all duration-1000"
+                      style={{ width: `${mlMetrics.modelAccuracy * 100}%` }}
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Fraud Detection Rate</span>
+                    <span className="text-sm font-medium">{formatConfidence(mlMetrics.fraudRate)}</span>
+                  </div>
+                  <div className="w-full bg-background/30 rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-red-500 to-orange-500 h-2 rounded-full transition-all duration-1000"
+                      style={{ width: `${mlMetrics.fraudRate * 100}%` }}
+                    />
+                  </div>
+                </div>
+                
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="w-full text-xs border-purple-500/20 text-purple-400 hover:bg-purple-500/10"
+                  asChild
+                >
+                  <Link href="/audit">
+                    View Detailed Analysis
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Quick Actions */}
         <motion.div
