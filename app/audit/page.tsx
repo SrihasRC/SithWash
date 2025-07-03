@@ -5,80 +5,11 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, AlertTriangle, Shield, Zap, Users, DollarSign, TrendingUp } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowLeft, AlertTriangle, Shield, Zap, Users, DollarSign, TrendingUp, Search } from "lucide-react";
 import Link from "next/link";
-
-// Types
-type Transaction = {
-  id: string;
-  from: string;
-  to: string;
-  amount: number;
-  timestamp: string;
-  riskScore: number;
-  flags: string[];
-  planet: string;
-  category: string;
-};
-
-// Mock transaction data
-const mockTransactions: Transaction[] = [
-  {
-    id: "TX001",
-    from: "Jabba's Palace Holdings",
-    to: "Cloud City Enterprises",
-    amount: 1250000,
-    timestamp: "2024-12-15T14:30:00Z",
-    riskScore: 95,
-    flags: ["High Amount", "Suspicious Pattern", "Known Entity"],
-    planet: "Tatooine → Bespin",
-    category: "Spice Trade"
-  },
-  {
-    id: "TX002", 
-    from: "Imperial Mining Corp",
-    to: "Outer Rim Logistics",
-    amount: 750000,
-    timestamp: "2024-12-15T13:45:00Z",
-    riskScore: 78,
-    flags: ["Cross-Border", "Shell Company"],
-    planet: "Kessel → Ryloth",
-    category: "Resource Export"
-  },
-  {
-    id: "TX003",
-    from: "Coruscant Bank",
-    to: "Anonymous Wallet 7X9",
-    amount: 2100000,
-    timestamp: "2024-12-15T12:20:00Z",
-    riskScore: 92,
-    flags: ["Anonymous Recipient", "Large Sum", "Time Anomaly"],
-    planet: "Coruscant → Unknown",
-    category: "Unknown"
-  },
-  {
-    id: "TX004",
-    from: "Mandalorian Contractors",
-    to: "Kaminoan Research Lab",
-    amount: 450000,
-    timestamp: "2024-12-15T11:15:00Z",
-    riskScore: 34,
-    flags: ["Legitimate Contract"],
-    planet: "Mandalore → Kamino",
-    category: "Defense Contract"
-  },
-  {
-    id: "TX005",
-    from: "Mos Eisley Cantina",
-    to: "Smugglers Alliance",
-    amount: 125000,
-    timestamp: "2024-12-15T10:30:00Z",
-    riskScore: 87,
-    flags: ["Known Criminal Network", "Small Frequent Transfers"],
-    planet: "Tatooine → Multiple",
-    category: "Illegal Services"
-  }
-];
+import { Transaction, mockTransactions, getTransactionById, getTransactionIds } from "@/data/transactions";
 
 export default function AuditPage() {
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
@@ -86,6 +17,10 @@ export default function AuditPage() {
   const [isScanning, setIsScanning] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [networkAnalysis, setNetworkAnalysis] = useState<string[]>([]);
+  const [searchId, setSearchId] = useState("");
+  const [searchError, setSearchError] = useState("");
+  const [scannedTransactions, setScannedTransactions] = useState<Transaction[]>([]);
+  const [scanType, setScanType] = useState<'deep' | 'target'>('deep');
 
   // Simulate scanning progress
   useEffect(() => {
@@ -129,8 +64,55 @@ export default function AuditPage() {
   };
 
   const startScan = () => {
+    setScanType('deep');
     setIsScanning(true);
     setScanProgress(0);
+    
+    // Simulate deep scan - randomly select 3-5 high-risk transactions
+    setTimeout(() => {
+      const highRiskTransactions = mockTransactions.filter(t => t.riskScore >= 70);
+      const randomTransactions = highRiskTransactions
+        .sort(() => Math.random() - 0.5)
+        .slice(0, Math.floor(Math.random() * 3) + 3);
+      
+      setScannedTransactions(randomTransactions);
+      setIsScanning(false);
+    }, 3000);
+  };
+
+  const scanTransactionById = () => {
+    if (!searchId.trim()) {
+      setSearchError("Please enter a Transaction ID");
+      return;
+    }
+
+    const transaction = getTransactionById(searchId);
+    if (!transaction) {
+      setSearchError(`Transaction ID "${searchId}" not found`);
+      return;
+    }
+
+    setSearchError("");
+    setScanType('target');
+    setSelectedTransaction(transaction);
+    setIsScanning(true);
+    setScanProgress(0);
+    
+    // Add to scanned transactions if not already there
+    setScannedTransactions(prev => {
+      const exists = prev.some(t => t.id === transaction.id);
+      if (!exists) {
+        return [...prev, transaction];
+      }
+      return prev;
+    });
+    
+    // Simulate scanning progress, then show modal
+    setTimeout(() => {
+      setIsScanning(false);
+      setShowDetailModal(true);
+      analyzeTransaction(transaction);
+    }, 2000);
   };
 
   const getRiskColor = (score: number) => {
@@ -240,7 +222,8 @@ export default function AuditPage() {
                 Initiate deep scan of galactic financial networks using Sith algorithms
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              {/* General Scan */}
               <div className="flex items-center space-x-4">
                 <Button
                   onClick={startScan}
@@ -266,6 +249,56 @@ export default function AuditPage() {
                   </div>
                 )}
               </div>
+
+              {/* Transaction ID Search */}
+              <div className="border-t border-border/20 pt-4">
+                <h3 className="text-lg font-semibold mb-3 flex items-center">
+                  <Search className="w-4 h-4 mr-2 text-destructive" />
+                  Target Transaction Scan
+                </h3>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex-1 space-y-2">
+                    <Input
+                      placeholder="Enter Transaction ID (e.g., TX001)"
+                      value={searchId}
+                      onChange={(e) => {
+                        setSearchId(e.target.value);
+                        setSearchError("");
+                      }}
+                      className="bg-background/50 border-border/20 focus:border-destructive/50"
+                    />
+                    <Select value={searchId} onValueChange={setSearchId}>
+                      <SelectTrigger className="bg-background/50 border-border/20">
+                        <SelectValue placeholder="Or select from available IDs" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getTransactionIds().map((id) => (
+                          <SelectItem key={id} value={id}>
+                            {id}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button
+                    onClick={scanTransactionById}
+                    disabled={isScanning || !searchId.trim()}
+                    className="bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                  >
+                    <Search className="w-4 h-4 mr-2" />
+                    Scan Transaction
+                  </Button>
+                </div>
+                {searchError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-2 p-2 bg-destructive/10 border border-destructive/20 rounded text-destructive text-sm"
+                  >
+                    {searchError}
+                  </motion.div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </motion.div>
@@ -278,63 +311,102 @@ export default function AuditPage() {
         >
           <Card className="bg-card/40 border-border/20 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle>Recent Suspicious Transactions</CardTitle>
+              <CardTitle className="flex items-center justify-between">
+                <span>
+                  {scannedTransactions.length > 0 ? 'Scanned Transactions' : 'Recent Suspicious Transactions'}
+                </span>
+                {scannedTransactions.length > 0 && (
+                  <Badge variant="outline" className="border-destructive/20 text-destructive">
+                    {scannedTransactions.length} scanned
+                  </Badge>
+                )}
+              </CardTitle>
               <CardDescription>
-                High-risk financial activities detected by the dark side algorithms
+                {scannedTransactions.length > 0 
+                  ? 'Transactions you have analyzed using the dark side scanner'
+                  : 'High-risk financial activities detected by the dark side algorithms'
+                }
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {mockTransactions.map((transaction, index) => (
-                  <motion.div
-                    key={transaction.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
-                    className="p-4 bg-card/60 rounded-lg border border-border/20 hover:bg-card/80 transition-colors cursor-pointer"
-                    onClick={() => analyzeTransaction(transaction)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <Badge variant="outline" className="text-xs">
-                            {transaction.id}
-                          </Badge>
-                          <Badge className={`text-xs ${getRiskBadgeColor(transaction.riskScore)}`}>
-                            Risk: {transaction.riskScore}%
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(transaction.timestamp).toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="flex items-center space-x-2 mb-2">
-                          <span className="font-medium">{transaction.from}</span>
-                          <span className="text-muted-foreground">→</span>
-                          <span className="font-medium">{transaction.to}</span>
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          <span className="mr-4">📍 {transaction.planet}</span>
-                          <span className="mr-4">💰 {transaction.amount.toLocaleString()} credits</span>
-                          <span>🏷️ {transaction.category}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className={`text-2xl font-bold ${getRiskColor(transaction.riskScore)}`}>
-                          {transaction.riskScore}%
-                        </div>
-                        <AlertTriangle className={`w-5 h-5 ${getRiskColor(transaction.riskScore)}`} />
-                      </div>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {transaction.flags.map((flag, i) => (
-                        <Badge key={i} variant="secondary" className="text-xs">
-                          {flag}
+              {scannedTransactions.length === 0 ? (
+                <div className="text-center py-8">
+                  <Zap className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground mb-2">No transactions scanned yet</p>
+                  <p className="text-sm text-muted-foreground">Use the scanner above to analyze transactions</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {scannedTransactions.map((transaction, index) => (
+                    <motion.div
+                      key={transaction.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
+                      className="p-4 bg-card/60 rounded-lg border border-border/20 hover:bg-card/80 transition-colors cursor-pointer relative"
+                      onClick={() => analyzeTransaction(transaction)}
+                    >
+                      <div className="absolute top-2 right-2">
+                        <Badge variant="secondary" className="text-xs">
+                          Analyzed
                         </Badge>
-                      ))}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <Badge variant="outline" className="text-xs">
+                              {transaction.id} ({scanType === 'deep' ? 'Deep Scan' : 'Target Scan'})
+                            </Badge>
+                            <Badge className={`text-xs ${getRiskBadgeColor(transaction.riskScore)}`}>
+                              Risk: {transaction.riskScore}%
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(transaction.timestamp).toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2 mb-2">
+                            <span className="font-medium">{transaction.from}</span>
+                            <span className="text-muted-foreground">→</span>
+                            <span className="font-medium">{transaction.to}</span>
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            <span className="mr-4">📍 {transaction.planet}</span>
+                            <span className="mr-4">💰 {transaction.amount.toLocaleString()} credits</span>
+                            <span>🏷️ {transaction.category}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className={`text-2xl font-bold ${getRiskColor(transaction.riskScore)}`}>
+                            {transaction.riskScore}%
+                          </div>
+                          <AlertTriangle className={`w-5 h-5 ${getRiskColor(transaction.riskScore)}`} />
+                        </div>
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {transaction.flags.map((flag, i) => (
+                          <Badge key={i} variant="secondary" className="text-xs">
+                            {flag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Clear History Button */}
+              {scannedTransactions.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-border/20">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setScannedTransactions([])}
+                    className="border-destructive/20 text-destructive hover:bg-destructive/10"
+                  >
+                    Clear Scan History
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>
