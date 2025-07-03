@@ -9,18 +9,32 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, AlertTriangle, Shield, Zap, Users, DollarSign, TrendingUp, Search } from "lucide-react";
 import Link from "next/link";
-import { Transaction, mockTransactions, getTransactionById, getTransactionIds } from "@/data/transactions";
+import { 
+  generateEnhancedTransactions, 
+  type EnhancedTransaction, 
+  getRiskLevelColor, 
+  getRiskLevelBadge, 
+  formatConfidence,
+  getTopRiskFactors 
+} from "@/lib/transaction-ml-utils";
 
 export default function AuditPage() {
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [selectedTransaction, setSelectedTransaction] = useState<EnhancedTransaction | null>(null);
   const [scanProgress, setScanProgress] = useState(0);
   const [isScanning, setIsScanning] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [networkAnalysis, setNetworkAnalysis] = useState<string[]>([]);
   const [searchId, setSearchId] = useState("");
   const [searchError, setSearchError] = useState("");
-  const [scannedTransactions, setScannedTransactions] = useState<Transaction[]>([]);
+  const [scannedTransactions, setScannedTransactions] = useState<EnhancedTransaction[]>([]);
   const [scanType, setScanType] = useState<'deep' | 'target'>('deep');
+  const [enhancedTransactions, setEnhancedTransactions] = useState<EnhancedTransaction[]>([]);
+
+  // Initialize enhanced transactions
+  useEffect(() => {
+    const transactions = generateEnhancedTransactions(50);
+    setEnhancedTransactions(transactions);
+  }, []);
 
   // Simulate scanning progress
   useEffect(() => {
@@ -38,20 +52,27 @@ export default function AuditPage() {
     }
   }, [isScanning]);
 
-  const analyzeTransaction = (transaction: Transaction) => {
+  const analyzeTransaction = (transaction: EnhancedTransaction) => {
     setSelectedTransaction(transaction);
     setShowDetailModal(true);
     
-    // Simulate network analysis
+    // Generate ML-powered analysis results
+    const mlPrediction = transaction.mlPrediction;
+    const confidence = mlPrediction?.probability || 0;
+    const riskLevel = transaction.riskLevel;
+    const topFeatures = mlPrediction?.topFeatures || [];
+    
     const analysisResults = [
-      `🔍 Analyzing transaction path: ${transaction.from} → ${transaction.to}`,
-      `📊 Risk assessment: ${transaction.riskScore}% - ${transaction.riskScore >= 80 ? 'CRITICAL' : transaction.riskScore >= 60 ? 'HIGH' : 'MEDIUM'} threat level`,
-      `🌐 Cross-referencing with known criminal networks...`,
-      `⚡ Dark side algorithms detecting suspicious patterns...`,
-      `🎯 Entity relationship mapping complete`,
-      `📈 Historical transaction analysis: ${Math.floor(Math.random() * 50) + 10} similar patterns found`,
-      `⚠️ Compliance violations: ${transaction.flags.length} flags raised`,
-      `🔐 Encryption analysis: ${transaction.riskScore > 70 ? 'Obfuscated' : 'Standard'} protocols detected`
+      `🔍 Analyzing transaction: ${transaction.id}`,
+      `🤖 ML Risk Score: ${formatConfidence(confidence)} - ${riskLevel.toUpperCase()} threat level`,
+      `📊 Model Confidence: ${mlPrediction?.confidence || 'unknown'}`,
+      `🧠 Top Risk Factors: ${getTopRiskFactors(mlPrediction?.reasoning || []).join(', ')}`,
+      `⚡ Feature Analysis Complete - ${topFeatures.length} key patterns identified`,
+      `� Address Analysis: ${transaction.from} → ${transaction.to}`,
+      `💰 Transaction Value: ${transaction.amount} (${transaction.gasUsed} gas used)`,
+      `🔐 ML Model Detection: ${mlPrediction?.isFraud ? 'FRAUD DETECTED' : 'LEGITIMATE'} transaction`,
+      `📈 Historical Pattern Match: ${Math.floor(confidence * 100)}% similarity to known patterns`,
+      `⚠️ Compliance Status: ${transaction.flaggedReason?.length || 0} risk flags identified`
     ];
     
     setNetworkAnalysis(analysisResults);
@@ -68,9 +89,11 @@ export default function AuditPage() {
     setIsScanning(true);
     setScanProgress(0);
     
-    // Simulate deep scan - randomly select 3-5 high-risk transactions
+    // Simulate deep scan - select high-risk transactions from enhanced transactions
     setTimeout(() => {
-      const highRiskTransactions = mockTransactions.filter(t => t.riskScore >= 70);
+      const highRiskTransactions = enhancedTransactions.filter(t => 
+        t.riskLevel === 'high' || t.riskLevel === 'critical'
+      );
       const randomTransactions = highRiskTransactions
         .sort(() => Math.random() - 0.5)
         .slice(0, Math.floor(Math.random() * 3) + 3);
@@ -86,7 +109,8 @@ export default function AuditPage() {
       return;
     }
 
-    const transaction = getTransactionById(searchId);
+    // Find transaction in enhanced transactions
+    const transaction = enhancedTransactions.find(t => t.id === searchId);
     if (!transaction) {
       setSearchError(`Transaction ID "${searchId}" not found`);
       return;
@@ -115,18 +139,12 @@ export default function AuditPage() {
     }, 2000);
   };
 
-  const getRiskColor = (score: number) => {
-    if (score >= 80) return "text-red-500";
-    if (score >= 60) return "text-orange-500";
-    if (score >= 40) return "text-yellow-500";
-    return "text-green-500";
+  const getRiskColor = (riskLevel: string) => {
+    return getRiskLevelColor(riskLevel);
   };
 
-  const getRiskBadgeColor = (score: number) => {
-    if (score >= 80) return "bg-red-500/20 text-red-400 border-red-500/30";
-    if (score >= 60) return "bg-orange-500/20 text-orange-400 border-orange-500/30";
-    if (score >= 40) return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-    return "bg-green-500/20 text-green-400 border-green-500/30";
+  const getRiskBadgeColor = (riskLevel: string) => {
+    return getRiskLevelBadge(riskLevel);
   };
 
   return (
@@ -272,9 +290,9 @@ export default function AuditPage() {
                         <SelectValue placeholder="Or select from available IDs" />
                       </SelectTrigger>
                       <SelectContent>
-                        {getTransactionIds().map((id) => (
-                          <SelectItem key={id} value={id}>
-                            {id}
+                        {enhancedTransactions.slice(0, 10).map((transaction) => (
+                          <SelectItem key={transaction.id} value={transaction.id}>
+                            {transaction.id}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -357,33 +375,33 @@ export default function AuditPage() {
                             <Badge variant="outline" className="text-xs">
                               {transaction.id} ({scanType === 'deep' ? 'Deep Scan' : 'Target Scan'})
                             </Badge>
-                            <Badge className={`text-xs ${getRiskBadgeColor(transaction.riskScore)}`}>
-                              Risk: {transaction.riskScore}%
+                            <Badge className={`text-xs ${getRiskBadgeColor(transaction.riskLevel)}`}>
+                              Risk: {transaction.riskLevel.toUpperCase()}
                             </Badge>
                             <span className="text-xs text-muted-foreground">
                               {new Date(transaction.timestamp).toLocaleString()}
                             </span>
                           </div>
                           <div className="flex items-center space-x-2 mb-2">
-                            <span className="font-medium">{transaction.from}</span>
+                            <span className="font-medium">{transaction.from.slice(0, 12)}...</span>
                             <span className="text-muted-foreground">→</span>
-                            <span className="font-medium">{transaction.to}</span>
+                            <span className="font-medium">{transaction.to.slice(0, 12)}...</span>
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            <span className="mr-4">📍 {transaction.planet}</span>
-                            <span className="mr-4">💰 {transaction.amount.toLocaleString()} credits</span>
-                            <span>🏷️ {transaction.category}</span>
+                            <span className="mr-4">� {transaction.amount}</span>
+                            <span className="mr-4">⚡ {transaction.gasUsed} gas</span>
+                            <span>🏷️ {transaction.type}</span>
                           </div>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <div className={`text-2xl font-bold ${getRiskColor(transaction.riskScore)}`}>
-                            {transaction.riskScore}%
+                          <div className={`text-2xl font-bold ${getRiskColor(transaction.riskLevel)}`}>
+                            {formatConfidence(transaction.mlPrediction?.probability || 0)}
                           </div>
-                          <AlertTriangle className={`w-5 h-5 ${getRiskColor(transaction.riskScore)}`} />
+                          <AlertTriangle className={`w-5 h-5 ${getRiskColor(transaction.riskLevel)}`} />
                         </div>
                       </div>
                       <div className="mt-2 flex flex-wrap gap-1">
-                        {transaction.flags.map((flag, i) => (
+                        {transaction.flaggedReason?.map((flag, i) => (
                           <Badge key={i} variant="secondary" className="text-xs">
                             {flag}
                           </Badge>
@@ -422,9 +440,19 @@ export default function AuditPage() {
             className="bg-card/95 backdrop-blur-md border border-border/20 rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">
-                <span className="text-destructive">Deep Analysis:</span> {selectedTransaction.id}
-              </h2>
+              <div>
+                <h2 className="text-2xl font-bold">
+                  <span className="text-destructive">ML Analysis:</span> {selectedTransaction.id}
+                </h2>
+                <div className="flex items-center gap-2 mt-2">
+                  <Badge className={`${getRiskBadgeColor(selectedTransaction.riskLevel)}`}>
+                    {selectedTransaction.mlPrediction?.isFraud ? 'FRAUD DETECTED' : 'LEGITIMATE'}
+                  </Badge>
+                  <Badge variant="outline">
+                    {formatConfidence(selectedTransaction.mlPrediction?.probability || 0)} Risk
+                  </Badge>
+                </div>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
@@ -449,43 +477,61 @@ export default function AuditPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">To:</span>
-                      <span className="font-medium">{selectedTransaction.to}</span>
+                      <span className="font-medium">{selectedTransaction.to.slice(0, 12)}...</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Amount:</span>
-                      <span className="font-medium">{selectedTransaction.amount.toLocaleString()} credits</span>
+                      <span className="font-medium">{selectedTransaction.amount}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Route:</span>
-                      <span className="font-medium">{selectedTransaction.planet}</span>
+                      <span className="text-muted-foreground">Gas Used:</span>
+                      <span className="font-medium">{selectedTransaction.gasUsed}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Category:</span>
-                      <span className="font-medium">{selectedTransaction.category}</span>
+                      <span className="text-muted-foreground">Type:</span>
+                      <span className="font-medium">{selectedTransaction.type}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Risk Score:</span>
-                      <Badge className={`${getRiskBadgeColor(selectedTransaction.riskScore)}`}>
-                        {selectedTransaction.riskScore}%
+                      <span className="text-muted-foreground">Status:</span>
+                      <span className="font-medium">{selectedTransaction.status}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Risk Level:</span>
+                      <Badge className={`${getRiskBadgeColor(selectedTransaction.riskLevel)}`}>
+                        {selectedTransaction.riskLevel.toUpperCase()}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">ML Probability:</span>
+                      <Badge className={`${getRiskBadgeColor(selectedTransaction.riskLevel)}`}>
+                        {formatConfidence(selectedTransaction.mlPrediction?.probability || 0)}
                       </Badge>
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Risk Flags */}
+                {/* ML Features & Risk Factors */}
                 <Card className="bg-card/40 border-border/20">
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center">
                       <AlertTriangle className="w-5 h-5 mr-2 text-destructive" />
-                      Risk Flags
+                      ML Risk Factors
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedTransaction.flags.map((flag, i) => (
-                        <Badge key={i} variant="destructive" className="text-xs">
-                          {flag}
-                        </Badge>
+                    <div className="space-y-3">
+                      {selectedTransaction.flaggedReason?.map((reason, i) => (
+                        <div key={i} className="p-2 bg-destructive/10 rounded text-sm">
+                          {reason}
+                        </div>
+                      ))}
+                      {selectedTransaction.mlPrediction?.topFeatures.slice(0, 5).map((feature, i) => (
+                        <div key={i} className="flex justify-between items-center p-2 bg-background/50 rounded">
+                          <span className="text-sm">{feature.feature}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {feature.importance.toFixed(3)}
+                          </Badge>
+                        </div>
                       ))}
                     </div>
                   </CardContent>
