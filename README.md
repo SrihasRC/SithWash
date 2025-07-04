@@ -13,7 +13,8 @@
 
 🔗 YT - Video : https://www.youtube.com/watch?v=jeju3es6tZg
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/jeju3es6tZg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[![Watch the video](https://img.youtube.com/vi/jeju3es6tZg/0.jpg)](https://www.youtube.com/watch?v=jeju3es6tZg)
+
 
 
 ## 📋 Table of Contents
