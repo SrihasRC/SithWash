@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import DarthModel from "@/components/darthModel";
 
 export default function Home() {
   return (
@@ -30,113 +31,169 @@ export default function Home() {
         }} />
         
         <div className="relative container mx-auto px-4 py-20 sm:py-32 lg:py-40 z-10">
-          <div className="text-center space-y-8">
-            {/* Animated Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="flex justify-center"
-            >
-              <Badge variant="outline" className="border-destructive/20 text-destructive px-4 py-2 backdrop-blur-sm bg-background/80">
-                🌟 Prompt Wars Hackathon - Team Black Walkers
-              </Badge>
-            </motion.div>
-
-            {/* Main Title */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="relative"
-            >
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight opacity-20 blur-sm">
-                  <span className="text-destructive">Sith</span>
-                  <span className="text-secondary">Wash</span>
-                </div>
-              </div>
-              <h1 className="relative text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight">
-                <span className="drop-shadow-lg bg-gradient-to-r from-destructive to-red-600 bg-clip-text text-transparent animate-pulse">
-                  Sith
-                </span>
-                <span className="drop-shadow-lg bg-gradient-to-r from-secondary to-purple-600 bg-clip-text text-transparent animate-pulse">
-                  Wash
-                </span>
-              </h1>
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div className="text-center lg:text-left space-y-8 pl-8">
+              {/* Animated Badge */}
               <motion.div
-                className="absolute -inset-4 bg-gradient-to-r from-destructive/20 via-transparent to-secondary/20 rounded-lg blur-xl opacity-75"
-                animate={{
-                  opacity: [0.3, 0.7, 0.3],
-                  scale: [0.95, 1.05, 0.95],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-              <p className="mt-6 text-xl sm:text-2xl text-muted-foreground font-medium relative">
-                <span className="bg-gradient-to-r from-muted-foreground to-white bg-clip-text text-transparent">
-                  Audit the Dark Flow
-                </span>
-              </p>
-            </motion.div>
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="flex justify-center lg:justify-start"
+              >
+                <Badge variant="outline" className="border-destructive/20 text-destructive px-4 py-2 backdrop-blur-sm bg-background/80">
+                  🌟 Prompt Wars Hackathon - Team Black Walkers
+                </Badge>
+              </motion.div>
 
-            {/* Description */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.4 }}
-              className="max-w-2xl mx-auto text-lg text-muted-foreground leading-relaxed"
-            >
-              A dark side-themed anti-money laundering simulation platform. 
-              Detect suspicious transactions and trace illicit funds through 
-              the galactic financial network.
-            </motion.p>
+              {/* Main Title */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.2 }}
+                className="relative"
+              >
+                <div className="absolute inset-0 flex items-center justify-center lg:justify-start">
+                  <div className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight opacity-20 blur-sm">
+                    <span className="text-destructive">Sith</span>
+                    <span className="text-secondary">Wash</span>
+                  </div>
+                </div>
+                <h1 className="relative text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
+                  <span className="drop-shadow-lg bg-gradient-to-r from-destructive to-red-600 bg-clip-text text-transparent animate-pulse">
+                    Sith
+                  </span>
+                  <span className="drop-shadow-lg bg-gradient-to-r from-secondary to-purple-600 bg-clip-text text-transparent animate-pulse">
+                    Wash
+                  </span>
+                </h1>
+                <motion.div
+                  className="absolute -inset-4 bg-gradient-to-r from-destructive/20 via-transparent to-secondary/20 rounded-lg blur-xl opacity-75"
+                  animate={{
+                    opacity: [0.3, 0.7, 0.3],
+                    scale: [0.95, 1.05, 0.95],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+                <p className="mt-6 text-xl sm:text-2xl text-muted-foreground font-medium relative">
+                  <span className="bg-gradient-to-r from-muted-foreground to-white bg-clip-text text-transparent">
+                    Audit the Dark Flow
+                  </span>
+                </p>
+              </motion.div>
 
-            {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-            >
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-destructive via-red-600 to-destructive rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
+              {/* Description */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.4 }}
+                className="max-w-2xl mx-auto lg:mx-0 text-lg text-muted-foreground leading-relaxed"
+              >
+                A dark side-themed anti-money laundering simulation platform. 
+                Detect suspicious transactions and trace illicit funds through 
+                the galactic financial network.
+              </motion.p>
+
+              {/* CTA Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.6 }}
+                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+              >
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-destructive via-red-600 to-destructive rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
+                  <Button 
+                    asChild 
+                    size="lg"
+                    className="relative bg-destructive hover:bg-destructive/90 text-destructive-foreground shadow-lg shadow-destructive/20 hover:shadow-destructive/40 transition-all duration-300 px-8 py-6 text-lg font-semibold"
+                  >
+                    <Link href="/dashboard">
+                      <motion.span
+                        className="inline-block"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        View Dashboard
+                      </motion.span>
+                    </Link>
+                  </Button>
+                </div>
                 <Button 
                   asChild 
+                  variant="outline" 
                   size="lg"
-                  className="relative bg-destructive hover:bg-destructive/90 text-destructive-foreground shadow-lg shadow-destructive/20 hover:shadow-destructive/40 transition-all duration-300 px-8 py-6 text-lg font-semibold"
+                  className="border-secondary/20 text-secondary hover:bg-secondary/10 px-8 py-6 text-lg font-semibold backdrop-blur-sm bg-background/80"
                 >
-                  <Link href="/dashboard">
+                  <Link href="/audit">
                     <motion.span
                       className="inline-block"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      View Dashboard
+                      Start Auditing
                     </motion.span>
                   </Link>
                 </Button>
-              </div>
-              <Button 
-                asChild 
-                variant="outline" 
-                size="lg"
-                className="border-secondary/20 text-secondary hover:bg-secondary/10 px-8 py-6 text-lg font-semibold backdrop-blur-sm bg-background/80"
+              </motion.div>
+            </div>
+
+            {/* Right Content - 3D Model */}
+            <div className="relative lg:block">
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 1, delay: 0.8 }}
+                className="relative h-[400px] lg:h-[600px] w-full"
               >
-                <Link href="/audit">
-                  <motion.span
-                    className="inline-block"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                {/* 3D Model Container */}
+                <div className="absolute inset-0 rounded-2xl overflow-hidden bg-gradient-to-br from-destructive/5 via-transparent to-secondary/5 backdrop-blur-sm border border-destructive/10">
+                  <DarthModel />
+                </div>
+                
+                {/* Floating Elements */}
+                <div className="absolute top-10 left-10 lg:-left-10">
+                  <motion.div
+                    animate={{
+                      y: [0, -10, 0],
+                      rotate: [0, 5, 0]
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
                   >
-                    Start Auditing
-                  </motion.span>
-                </Link>
-              </Button>
-            </motion.div>
+                    <Badge className="bg-destructive/20 text-destructive border-destructive/30 backdrop-blur-sm">
+                      ⚡ Force Powered
+                    </Badge>
+                  </motion.div>
+                </div>
+                
+                <div className="absolute bottom-10 right-10 lg:-right-10">
+                  <motion.div
+                    animate={{
+                      y: [0, 10, 0],
+                      rotate: [0, -5, 0]
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: 1
+                    }}
+                  >
+                    <Badge className="bg-secondary/20 text-secondary border-secondary/30 backdrop-blur-sm">
+                      🔍 AI Detection
+                    </Badge>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>
