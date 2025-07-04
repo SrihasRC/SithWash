@@ -9,19 +9,14 @@
 
 ## 🌟 Live Demo
 
-🔗 **[Deployed Website]** - *Link will be added soon*
-
-## 🎯 Hackathon Track
-
-**AI/ML Track** - Leveraging machine learning for financial fraud detection and anti-money laundering compliance
+🔗 **[Visit SithWash Live](https://sith-wash.vercel.app/)** - Experience the dark side of compliance
 
 ## 📋 Table of Contents
 
 - [Overview](#overview)
-- [Hackathon Track](#hackathon-track)
-- [Problem Statement](#problem-statement)
+- [Hackathon Track & Problem](#hackathon-track--problem)
 - [Business Model](#business-model)
-- [Bounties & Challenges](#bounties--challenges)
+- [Bounties Completed](#bounties-completed)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
@@ -36,94 +31,76 @@
 
 **SithWash** is a hackathon project that demonstrates an advanced anti-money laundering (AML) simulation platform with a unique Star Wars Sith theme. Built for educational and demonstration purposes, it showcases how machine learning can be integrated into financial compliance systems with an engaging, thematic user interface.
 
-The platform simulates real-world AML scenarios using pre-trained ML models and mock transaction data, providing an interactive way to understand fraud detection patterns and compliance workflows.
+The platform simulates real-world AML scenarios using pre-trained ML models and mock transaction data, providing an interactive way to understand fraud detection patterns and compliance workflows. With its dark, immersive interface and 3D interactive elements, SithWash makes financial compliance education both engaging and memorable.
 
-## 🚨 Problem Statement
+## 🏆 Hackathon Track & Problem
 
-### **The Challenge**
-Financial institutions lose **$2.8 billion annually** to money laundering activities, while compliance costs reach **$180 billion globally**. Traditional rule-based detection systems suffer from:
+### **Chosen Track: AI/ML in Finance**
+Building innovative AI-powered solutions for financial technology and compliance
 
-- **High False Positive Rates** (95%+) leading to investigation fatigue
-- **Manual Review Bottlenecks** causing delayed transaction processing
-- **Evolving Criminal Tactics** outpacing static detection rules
-- **Regulatory Complexity** with varying compliance requirements
-- **Training Gaps** in understanding sophisticated laundering patterns
+### **Problem Statement**
+Traditional anti-money laundering (AML) systems are complex, difficult to understand, and often inaccessible to those learning about financial compliance. There's a need for:
 
-### **Our Solution**
-SithWash addresses these challenges through:
+- **Educational Tools**: Interactive platforms to learn about AML processes
+- **ML Transparency**: Clear visualization of how AI models detect suspicious transactions
+- **Engaging Interfaces**: Making complex financial concepts accessible and interesting
+- **Practical Demonstration**: Real-world simulation of compliance workflows
 
-1. **AI-Powered Detection**: Machine learning models that adapt to new laundering patterns
-2. **Interactive Training**: Gamified learning platform for compliance teams
-3. **Real-time Risk Assessment**: Instant transaction scoring and prioritization
-4. **Visual Analytics**: Clear presentation of complex transaction networks
-5. **Simulation Environment**: Safe space to test detection strategies without real money
+### **Solution**
+SithWash addresses these challenges by:
+
+- **Gamification**: Using Star Wars Sith theme to make learning engaging
+- **Interactive ML**: Visual explanation of fraud detection algorithms
+- **3D Visualization**: Immersive network analysis of transaction patterns
+- **Educational Simulation**: Safe environment to explore AML concepts
 
 ## 💼 Business Model
 
-### **Target Market**
-- **Primary**: Regional banks and credit unions (10,000+ institutions globally)
-- **Secondary**: Fintech companies and payment processors
-- **Tertiary**: Compliance training organizations and consultancies
+### **Target Audience**
+- **Educational Institutions**: Finance and cybersecurity programs
+- **Training Organizations**: Corporate compliance training
+- **FinTech Companies**: AML education and awareness
+- **Regulatory Bodies**: Public education initiatives
 
 ### **Revenue Streams**
-1. **SaaS Subscription** ($50-500/month per user based on institution size)
-2. **Enterprise Licensing** (Custom pricing for large banks)
-3. **Training & Certification** ($299 per compliance professional)
-4. **API Integration** ($0.01 per transaction analyzed)
-5. **Consulting Services** (Implementation and customization)
+1. **Educational Licensing**: Subscription model for academic institutions
+2. **Corporate Training**: Custom training modules for financial organizations
+3. **Consulting Services**: AML system implementation and optimization
+4. **SaaS Platform**: White-label compliance education solutions
 
 ### **Value Proposition**
-- **ROI**: 40% reduction in false positives = $2M+ annual savings for mid-size banks
-- **Efficiency**: 60% faster case resolution through ML prioritization
-- **Compliance**: Simplified regulatory reporting and audit trails
-- **Training**: Gamified learning reduces onboarding time by 50%
+- **Cost Reduction**: Lower training costs compared to traditional methods
+- **Engagement**: Higher retention through gamified learning
+- **Scalability**: Reach unlimited users with digital platform
+- **Compliance**: Meet regulatory training requirements effectively
 
-### **Market Size**
-- **TAM**: $23.3B (Global AML software market by 2028)
-- **SAM**: $8.1B (Regional banks and fintech segment)
-- **SOM**: $162M (Achievable market share in 5 years)
+## 🏅 Bounties Completed
 
-## 🏆 Bounties & Challenges
+### ✅ **1. Dark Theme Implementation**
+- **Achievement**: Full dark theme across the entire website
+- **Details**: Consistent dark color scheme with red accents, professional Sith-inspired design
+- **Impact**: Enhanced user experience with modern, immersive interface
 
-### **Completed Challenges**
-✅ **AI/ML Innovation Challenge**
-- Implemented RandomForest classifier for fraud detection
-- Feature engineering for transaction pattern analysis
-- Real-time ML inference in web application
+### ✅ **2. Easter Egg Feature**
+- **Achievement**: Hidden interactive easter egg in the /about page
+- **Details**: Click on "Gray circle" 3 times to reveal a special Sith quote animation
+- **Location**: `/about` page - look for the "Floating Gray Circle" and click it multiple times
+- **Impact**: Added fun, discoverable element that encourages exploration
 
-✅ **Best Use of Technology Stack**
-- Next.js 15 with App Router for modern React development
-- TypeScript for type-safe development
-- Integration of Python ML models with JavaScript frontend
+### ✅ **3. Discord Community Participation**
+- **Achievement**: Active participation in Star Wars scene replay
+- **Details**: Engaged in community activities and Star Wars-themed discussions
+- **Impact**: Connected with the hackathon community and embraced the theme
 
-✅ **Creative Theme & Design Challenge**
-- Unique Star Wars Sith theme in fintech application
-- Dark UI with immersive user experience
-- Creative use of terminology and visual elements
-
-✅ **Full Stack Development**
-- Complete frontend and backend integration
-- 3D visualizations with Three.js
-- Responsive design across all devices
-
-### **Additional Achievements**
-🎯 **Technical Excellence**
-- Pre-trained ML models with 85%+ accuracy
-- 20 engineered features for transaction analysis
-- Interactive 3D network visualization
-- Real-time transaction simulation
-
-🎯 **User Experience**
-- Smooth animations with Framer Motion
-- Accessible design with ARIA compliance
-- Mobile-first responsive design
-- Intuitive navigation and workflows
-
-🎯 **Innovation Impact**
-- Educational approach to complex financial concepts
-- Gamified compliance training methodology
-- Simulation-based learning environment
-- Creative problem-solving in fintech education
+### ✅ **4. 3D Interactive Model**
+- **Achievement**: Integrated 3D Darth Vader model on homepage
+- **Details**: Interactive Three.js model with smooth loading animation and controls
+- **Features**: 
+  - Responsive scaling across devices
+  - Smooth rotation and interaction
+  - Loading state with Sith-themed spinner
+  - Prominent placement for immediate visual impact
+- **Impact**: Elevated visual experience and demonstrated 3D development skills
 
 ## ✨ Features
 
@@ -136,10 +113,12 @@ SithWash addresses these challenges through:
 
 ### 🎨 **User Experience**
 - **Sith Theme**: Dark, immersive UI with red accents and Star Wars terminology
+- **3D Interactive Model**: Prominent Darth Vader model on homepage with smooth controls
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 - **Interactive Visualizations**: Dynamic charts, graphs, and 3D network displays
 - **Smooth Animations**: Enhanced with Framer Motion for fluid user interactions
 - **Mock Data Simulation**: Realistic transaction patterns for demonstration
+- **Easter Egg**: Hidden interactive feature in the about page for discovery
 
 ### 🛡️ **Simulation Features**
 - **Transaction Generation**: Smart generation of realistic financial transaction patterns
@@ -156,7 +135,8 @@ SithWash addresses these challenges through:
 - **Styling**: Tailwind CSS 4.0
 - **Animations**: Framer Motion 12.23.0 for smooth interactions
 - **Icons**: Lucide React icon library
-- **3D Graphics**: Three.js & React Force Graph 3D
+- **3D Graphics**: Three.js with React Three Fiber for interactive Darth Vader model
+- **Visualizations**: React Force Graph 3D for network analysis
 
 ### **Machine Learning**
 - **Model**: Pre-trained RandomForest classifier (Python/scikit-learn)
@@ -181,7 +161,7 @@ SithWash addresses these challenges through:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/srihasrc/prompt-wars.git
+   git clone https://github.com/SrihasRC/SithWash.git
    cd prompt-wars
    ```
 
@@ -264,18 +244,33 @@ prompt-wars/
 
 ## 🏆 Hackathon Context
 
+### **Hackathon Submission Details**
+- **Event**: Star Wars-themed hackathon focusing on innovative technology solutions
+- **Track**: AI/ML in Finance - Building intelligent financial compliance tools
+- **Theme Integration**: Full Sith/Dark Side aesthetic with Star Wars terminology
+- **Development Time**: Rapid prototyping and full-stack implementation
+
 ### **Purpose**
 This project was developed as a hackathon submission to demonstrate:
-- **Creative Theming**: Unique Star Wars Sith theme in fintech
-- **Technical Skills**: Full-stack development with ML integration
-- **User Experience**: Engaging and educational interface design
-- **Problem Solving**: Innovative approach to financial compliance
+- **Creative Theming**: Unique Star Wars Sith theme in fintech application
+- **Technical Excellence**: Full-stack development with ML integration and 3D graphics
+- **User Experience**: Engaging and educational interface design with interactive elements
+- **Problem Solving**: Innovative approach to making financial compliance accessible
+- **Community Engagement**: Active participation in hackathon activities and bounties
+
+### **Hackathon Achievements**
+- ✅ **Dark Theme Mastery**: Comprehensive dark UI implementation
+- ✅ **3D Model Integration**: Interactive Darth Vader model with smooth animations
+- ✅ **Easter Egg Discovery**: Hidden interactive feature for user engagement
+- ✅ **Discord Participation**: Active community involvement in Star Wars activities
+- 🚀 **Live Deployment**: Fully functional website deployed and accessible
 
 ### **Educational Value**
-- **AML Awareness**: Understanding anti-money laundering processes
-- **ML in Finance**: Practical application of machine learning
-- **Risk Assessment**: Learning about financial risk evaluation
+- **AML Awareness**: Interactive understanding of anti-money laundering processes
+- **ML in Finance**: Practical application of machine learning in compliance
+- **Risk Assessment**: Hands-on learning about financial risk evaluation
 - **Compliance Workflow**: Simulated regulatory compliance processes
+- **Technology Integration**: Demonstration of modern web technologies in fintech
 
 ### **Demo Features**
 - **Mock Data**: Realistic but fictional transaction scenarios
@@ -285,23 +280,35 @@ This project was developed as a hackathon submission to demonstrate:
 
 ## 📊 Key Components
 
+### **Homepage**
+- **3D Darth Vader Model**: Interactive Three.js model with smooth controls and loading animation
+- **Hero Section**: Compelling introduction with Sith-themed messaging
+- **Feature Overview**: Quick access to main platform capabilities
+- **Responsive Layout**: Optimized two-column design for visual impact
+
 ### **Dashboard**
-- Real-time transaction monitoring
-- ML-powered fraud detection metrics
-- Risk distribution analytics
-- System activity tracking
+- Real-time transaction monitoring with dark theme
+- ML-powered fraud detection metrics and analytics
+- Risk distribution analytics with interactive charts
+- System activity tracking and compliance metrics
 
 ### **Audit System**
-- Deep transaction analysis
-- ML model explanations
-- Risk factor identification
-- Compliance reporting
+- Deep transaction analysis with detailed breakdowns
+- ML model explanations and feature importance
+- Risk factor identification and scoring
+- Compliance reporting and documentation
 
 ### **Network Analysis**
 - 3D transaction network visualization
-- Suspicious pattern detection
-- Connection analysis
-- Interactive network exploration
+- Suspicious pattern detection and highlighting
+- Connection analysis between entities
+- Interactive network exploration with zoom and pan
+
+### **About Page**
+- Project information and team details
+- **Easter Egg Feature**: Click "Dark Side" text 3 times for hidden animation
+- Technology stack overview
+- Educational content about AML and fraud detection
 
 ## 🎨 UI/UX Design
 
@@ -331,6 +338,24 @@ This project was developed as a hackathon submission to demonstrate:
 - **Type Safety**: Strict TypeScript interfaces for data structures
 - **Error Handling**: Graceful error states and user feedback
 
+## 🎯 Hackathon Readiness
+
+### **Submission Completeness**
+- ✅ **Live Deployment**: [https://sith-wash.vercel.app/](https://sith-wash.vercel.app/)
+- ✅ **Source Code**: Complete TypeScript/Next.js implementation
+- ✅ **Documentation**: Comprehensive README with all required details
+- ✅ **Bounties**: All 4 bounties successfully completed
+- ✅ **Theme Integration**: Full Star Wars Sith aesthetic throughout
+- ✅ **Technical Innovation**: ML integration, 3D graphics, and modern web stack
+
+### **Judge Evaluation Points**
+1. **Technical Complexity**: Full-stack app with ML, 3D graphics, and responsive design
+2. **Theme Adherence**: Comprehensive Sith/Dark Side theming with appropriate terminology
+3. **User Experience**: Intuitive interface with smooth animations and interactions
+4. **Innovation**: Creative approach to financial compliance education
+5. **Completeness**: Fully functional platform with multiple interconnected features
+6. **Code Quality**: TypeScript implementation with proper structure and best practices
+
 ## 🤝 Contributing
 
 This hackathon project welcomes contributions! Areas for improvement:
@@ -343,11 +368,14 @@ This hackathon project welcomes contributions! Areas for improvement:
 
 ## 🙏 Acknowledgments
 
-- **Star Wars Universe** - For the creative inspiration
-- **Next.js Team** - For the amazing React framework
-- **Shadcn/ui** - For the beautiful UI components
-- **Scikit-learn** - For the machine learning capabilities
-- **Hackathon Community** - For the motivation and creativity
+- **Star Wars Universe** - For the creative inspiration and iconic characters
+- **Hackathon Organizers** - For the amazing event and bounty opportunities
+- **Next.js Team** - For the incredible React framework and development experience
+- **Shadcn/ui** - For the beautiful, accessible UI component library
+- **Three.js Community** - For the powerful 3D graphics capabilities
+- **Scikit-learn** - For the robust machine learning framework
+- **Vercel** - For seamless deployment and hosting
+- **Discord Community** - For the engaging Star Wars activities and support
 
 ---
 
@@ -355,5 +383,5 @@ This hackathon project welcomes contributions! Areas for improvement:
 
 *"Fear leads to anger, anger leads to hate, hate leads to compliance."*
 
-### 🎯 Hackathon Achievement
-This project demonstrates full-stack development skills, creative problem-solving, and innovative use of technology to make financial compliance education engaging and accessible.
+### 🎯 Hackathon Achievement Summary
+This project demonstrates comprehensive full-stack development skills, creative problem-solving, innovative use of modern web technologies, and successful completion of all hackathon bounties. SithWash represents a unique approach to making financial compliance education engaging, accessible, and memorable through immersive theming and interactive technology.
