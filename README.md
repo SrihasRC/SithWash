@@ -86,8 +86,8 @@ The platform simulates real-world AML scenarios using pre-trained ML models and 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/srihasrc/prompt-wars.git
-   cd prompt-wars
+   git clone https://github.com/SrihasRC/SithWash
+   cd SithWash
    ```
 
 2. **Install dependencies**
